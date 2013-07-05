@@ -1,0 +1,28 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+import java.beans.Introspector;
+
+
+// doc in http://www.gradle.org/docs/current/javadoc/
+
+// this is run after a task is configured
+gradle.projectsEvaluated { gradle ->
+    gradle.rootProject.allprojects {
+                tasks.each { t ->
+                            println "task - ${t}"
+                                    }
+                                        }
+}
+
+// this is as Gradle runs tasks
+gradle.taskGraph.afterTask { task, state ->
+    println "Running ${task}"
+        task.class.declaredMethods.findAll { it.name.startsWith("get") }.each { m ->
+              println "  ${Introspector.decapitalize(m.name.substring(3))}\t\t\t${m.returnType}"
+              if (m.parameterTypes.length==0)
+                  println("\t\t${m.invoke(task)}")
+        }
+}
+
+// try something like 'gradle clean assemble' and see the dump
+
